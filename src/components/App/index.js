@@ -1,36 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Note from "../Note";
 import { v4 as uuidv4 } from "uuid";
 import { GlobalStyle } from "../../global-styles";
 
 function App() {
-  const [notes, setNotes] = useState([
-    {
-      id: uuidv4(),
-      text:
-        "In semper lobortis turpis faucibus sodales. Curabitur vitae urna lacinia, eleifend enim id, ultricies magna.",
-      color: { primary: "#f2f2f2", darker: "#c7c7c7", darkest: "#7c7c7c" },
-    },
-    {
-      id: uuidv4(),
-      text:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at ipsum et tellus lobortis elementum ut id mauris.",
-      color: { primary: "#ebf1f5", darker: "#c9d9e4", darkest: "#88a2b3" },
-    },
-    {
-      id: uuidv4(),
-      text:
-        "Integer a nibh rhoncus, vulputate arcu ac, efficitur nisl. Proin ornare mauris ut neque blandit, ut vehicula metus venenatis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et cursus odio.",
-      color: { primary: "#f0e4e4", darker: "#e0c1c1", darkest: "#ba7e7e" },
-    },
-  ]);
+  const [notes, setNotes] = useState(
+    JSON.parse(localStorage.getItem("notes")) || [
+      {
+        id: uuidv4(),
+        text:
+          "In semper lobortis turpis faucibus sodales. Curabitur vitae urna lacinia, eleifend enim id, ultricies magna.",
+        color: { primary: "#f2f2f2", darker: "#c7c7c7", darkest: "#7c7c7c" },
+      },
+      {
+        id: uuidv4(),
+        text:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at ipsum et tellus lobortis elementum ut id mauris.",
+        color: { primary: "#ebf1f5", darker: "#c9d9e4", darkest: "#88a2b3" },
+      },
+      {
+        id: uuidv4(),
+        text:
+          "Integer a nibh rhoncus, vulputate arcu ac, efficitur nisl. Proin ornare mauris ut neque blandit, ut vehicula metus venenatis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et cursus odio.",
+        color: { primary: "#f0e4e4", darker: "#e0c1c1", darkest: "#ba7e7e" },
+      },
+    ]
+  );
+
+  useEffect(() => {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }, [notes]);
 
   const createNote = () => {
     const newNote = {
       id: uuidv4(),
       text: "Click the edit button below to get started.",
-      color: "#f2f2f2",
+      color: { primary: "#f2f2f2", darker: "#c7c7c7", darkest: "#7c7c7c" },
     };
     setNotes([newNote, ...notes]);
   };
