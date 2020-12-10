@@ -1,8 +1,13 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
-const colors = ["#f2f2f2", "#ebf1f5", "#f7f5eb", "#f0e4e4"];
+const colors = [
+  { primary: "#f2f2f2", darker: "#c7c7c7", darkest: "#7c7c7c" },
+  { primary: "#ebf1f5", darker: "#c9d9e4", darkest: "#88a2b3" },
+  { primary: "#f7f5eb", darker: "#f1ebcb", darkest: "#a79e6f" },
+  { primary: "#f0e4e4", darker: "#e0c1c1", darkest: "#ba7e7e" },
+];
 
 function Note({ setNotes, notes, note: { id, text, color } }) {
   const [noteText, setNoteText] = useState(text);
@@ -46,11 +51,11 @@ function Note({ setNotes, notes, note: { id, text, color } }) {
   };
 
   return (
-    <Container bgColor={color}>
+    <Container bgColor={color.primary}>
       <NoteTextContainer>
         {isTextareaVisible ? (
           <Textarea
-            bgColor={color}
+            bgColor={color.darker}
             onChange={(e) => setNoteText(e.target.value)}
             value={noteText}
           ></Textarea>
@@ -65,32 +70,35 @@ function Note({ setNotes, notes, note: { id, text, color } }) {
           <ColorPalette>
             {colors.map((color) => (
               <Color
-                key={color}
-                bgColor={color}
+                key={color.primary}
+                bgColor={color.darker}
                 onClick={() => handleColorChange(color)}
               ></Color>
             ))}
           </ColorPalette>
         ) : null}
         {isTextareaVisible ? (
-          <Button onClick={handleSave}>
-            <Icon
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-              />
-            </Icon>
-          </Button>
+          <SaveButtonContainer>
+            <SaveButton color={color} onClick={handleSave}>
+              <SaveIcon
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                />
+              </SaveIcon>
+            </SaveButton>
+          </SaveButtonContainer>
         ) : (
           <Button
+            color={color}
             onClick={() => {
               setIsTextareaVisible(true);
             }}
@@ -111,7 +119,7 @@ function Note({ setNotes, notes, note: { id, text, color } }) {
             </Icon>
           </Button>
         )}
-        <Button onClick={handleDelete}>
+        <Button color={color} onClick={handleDelete}>
           <Icon
             className="w-6 h-6"
             fill="none"
@@ -127,7 +135,7 @@ function Note({ setNotes, notes, note: { id, text, color } }) {
             />
           </Icon>
         </Button>
-        <Button onClick={() => setIsColorPaletteVisible(true)}>
+        <Button color={color} onClick={() => setIsColorPaletteVisible(true)}>
           <Icon
             className="w-6 h-6"
             fill="none"
@@ -148,14 +156,23 @@ function Note({ setNotes, notes, note: { id, text, color } }) {
   );
 }
 
+const slide = keyframes`
+  from {
+    width: 0;
+  }
+
+  to {
+    width: calc(100% - 20px);
+  }
+`;
+
 const Container = styled.div`
-  background-color: ${(props) => (props.bgColor ? props.bgColor : "#f2f2f2")};
+  background-color: ${(props) => props.bgColor || "#f2f2f2"};
   border-radius: 3px;
-  min-height: 300px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 15px;
+  min-height: 300px;
   width: 100%;
 `;
 
@@ -163,28 +180,75 @@ const NoteTextContainer = styled.div`
   display: flex;
   flex-grow: 1;
 `;
-const NoteText = styled.div``;
+
+const NoteText = styled.div`
+  padding: 15px;
+`;
+
 const Textarea = styled.textarea`
-  background-color: ${(props) => (props.bgColor ? props.bgColor : "#f2f2f2")};
+  background-color: ${(props) => props.bgColor || "#f2f2f2"};
   border-radius: 3px;
   border: none;
   flex-grow: 1;
   font-family: inherit;
   font-size: 1rem;
+  padding: 15px;
+
+  &:focus {
+    outline: none;
+  }
 `;
 
 const Toolbar = styled.div`
+  align-items: center;
   color: #000;
-  display: flex;
-  justify-content: space-evenly;
-  padding-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: 65px;
+  justify-content: center;
+  padding: 0 15px;
   position: relative;
 `;
 
+const SaveButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const SaveButton = styled.button`
+  align-items: center;
+  background-color: #000000;
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+
+  &:focus {
+    background-color: ${(props) => props.color.darkest || "#000000"};
+    outline: none;
+  }
+
+  &:hover {
+    background-color: ${(props) => props.color.darkest || "#000000"};
+  }
+`;
+
+const SaveIcon = styled.svg`
+  height: 22px;
+  width: 22px;
+`;
+
 const Button = styled.button`
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
+  &:focus {
+    color: ${(props) => props.color.darkest || "#000000"};
+    outline: none;
+  }
+
+  &:hover {
+    color: ${(props) => props.color.darkest || "#000000"};
+  }
 `;
 
 const Icon = styled.svg`
@@ -195,23 +259,26 @@ const Icon = styled.svg`
 const ColorPalette = styled.div`
   align-items: center;
   background-color: #ffffff;
-  border-radius: 3px;
+  border-radius: 26px;
   display: flex;
   justify-content: space-evenly;
-  left: 0;
-  padding: 10px 0;
+  right: 10px;
+  padding: 13px 0;
   position: absolute;
   top: 0;
-  width: 100%;
+  width: calc(100% - 20px);
+  animation: ${slide} 0.3s ease-out;
 `;
 
 const Color = styled.button`
-  background-color: ${(props) => (props.bgColor ? props.bgColor : "white")};
+  background-color: ${(props) => props.bgColor || "#f2f2f2"};
   border-radius: 50%;
-  border: none;
-  cursor: pointer;
   height: 30px;
   width: 30px;
+
+  &:focus {
+    outline: none;
+  }
 `;
 
 export default Note;
